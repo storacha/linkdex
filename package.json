@@ -1,0 +1,26 @@
+{
+  "name": "linkdex",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "An index mapping block CID to linked block CID.",
+  "main": "index.js",
+  "bin": {
+    "linkdex": "./bin.js"
+  },
+  "scripts": {
+    "start": "./bin.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@ipld/car": "^4.1.4",
+    "@ipld/dag-cbor": "^7.0.2",
+    "@ipld/dag-json": "^8.0.10",
+    "@ipld/dag-pb": "^2.1.17",
+    "multiformats": "^9.7.1"
+  },
+  "devDependencies": {
+    "standard": "^17.0.0"
+  }
+}

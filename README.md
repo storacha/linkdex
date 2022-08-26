@@ -14,8 +14,7 @@ npm install
 pass it a car file, it writes the index in mermaid syntax to stdout  ✨🎷🐩
 
 ```console
-npm start ~/Code/olizilla/cardex-cli/upload-test-10mib.car
-~/Code/web3-storage/linkdex/bin.js lols.car
+npm start ~/Code/olizilla/cardex-cli/lols.car
 ```
 
 ```mermaid

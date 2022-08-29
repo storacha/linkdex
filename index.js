@@ -8,10 +8,15 @@ export async function * decodedBlocks (carStream) {
   }
 }
 
-export async function linkdex (inStream) {
-  for await (const block of decodedBlocks(inStream)) {
+export async function * linkdex (carStream) {
+  for await (const block of decodedBlocks(carStream)) {
+    let hasLinks = false
     for (const [path, targetCid] of block.links()) {
-      console.log(`${block.cid.toString()} --> ${targetCid.toString()}`)
+      hasLinks = true
+      yield { src: block.cid.toString(), dest: targetCid.toString() }
+    }
+    if (!hasLinks) {
+      yield { src: block.cid.toString() }
     }
   }
 }

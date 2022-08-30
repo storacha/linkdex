@@ -11,7 +11,7 @@ const cli = sade('linkdex')
 
 cli
   .version(pkg.version)
-  .example('report patial.car')
+  .example('report partial.car')
 
 cli.command('report <car>')
   .describe('Print a linkdex report for a car')

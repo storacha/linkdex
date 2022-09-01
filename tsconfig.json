@@ -1,13 +1,18 @@
 {
-  "files": ["index.js", "decode.js"],
+  "include": ["**/*.js"],
   "compilerOptions": {
+    "declaration": true,
+    "declarationMap": true,
+    "emitDeclarationOnly": true,
+    "outDir": "dist",
     "allowJs": true,
     "checkJs": true,
-    "declaration": true,
     "esModuleInterop": true,
     "moduleResolution": "node",
     "skipLibCheck": true,
-    "lib": ["ES2021"],
-    "target": "ES2021"
+    "resolveJsonModule": true,
+    "lib": ["ES2021", "DOM"],
+    "target": "ES2021",
+    "module": "es2020",
   }
 }

@@ -71,3 +71,4 @@ export class LinkIndexer {
     };
 }
 export type DagStructure = 'Complete' | 'Partial' | 'Unknown';
+//# sourceMappingURL=index.d.ts.map

@@ -10,3 +10,4 @@ export function maybeDecode({ cid, bytes }: import('@ipld/car/api').Block, { cod
     codecs?: object;
 }): Block.Block<any> | undefined;
 import * as Block from "multiformats/block";
+//# sourceMappingURL=decode.d.ts.map

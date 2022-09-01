@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 
-import fs from 'fs'
+import * as fs from 'fs';
 import sade from 'sade'
 import { linkdex, LinkIndexer } from './index.js'
 import { CarBlockIterator } from '@ipld/car/iterator'
 import { pipeline } from 'node:stream/promises'
 
-const pkg = JSON.parse(fs.readFileSync(new URL('./package.json', import.meta.url)))
+const pkg = JSON.parse(fs.readFileSync(new URL('./package.json', import.meta.url), {encoding: 'utf-8'}))
 
 const cli = sade('linkdex')
 

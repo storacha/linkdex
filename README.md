@@ -57,3 +57,13 @@ bafybeif5xvhik6thha5ykg3g73jo3mqd5mhb7orzeznnvwquashmwryhai --> bafkreid3pefuwyv
 bafybeif5xvhik6thha5ykg3g73jo3mqd5mhb7orzeznnvwquashmwryhai --> bafkreigr3beehu5ebbgoisx4rl2vyaqebmohubauc6avefodb5jauz3tyi
 
 ```
+
+### Generating type declarations
+
+Add good typescript flavour JSDoc comments to the JS source, then **validate** them and **generate** the `index.d.ts` declaration file:
+
+```console
+$ npm run tsc
+```
+
+see: https://www.typescriptlang.org/docs/handbook/declaration-files/dts-from-js.html

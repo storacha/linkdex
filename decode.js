@@ -1,20 +1,27 @@
-import { sha256 as hasher } from 'multiformats/hashes/sha2'
 import * as Block from 'multiformats/block'
 import * as raw from 'multiformats/codecs/raw'
-import * as dagPb from '@ipld/dag-pb'
-import * as dagCbor from '@ipld/dag-cbor'
-import * as dagJson from '@ipld/dag-json'
+import * as json from '@ipld/dag-json'
+import * as cbor from '@ipld/dag-cbor'
+import * as pb from '@ipld/dag-pb'
 
-/** @type {BlockDecoders} */
-const Decoders = {
+const decoders = {
+  [pb.code]: pb,
   [raw.code]: raw,
-  [dagPb.code]: dagPb,
-  [dagCbor.code]: dagCbor,
-  [dagJson.code]: dagJson
+  [cbor.code]: cbor,
+  [json.code]: json
 }
 
-export async function decode ({ cid, bytes }) {
-  const decoder = Decoders[cid.code]
-  if (!decoder) throw new Error(`unknown codec: ${cid.code}`)
-  return Block.decode({ bytes, codec: decoder, hasher })
+/**
+ * Decode a CAR Block (bytes) into a multiformats Block.
+ * Decoding allows us to find out if that block links to any others by CID.
+ * @param {import('@ipld/car/api').Block} block
+ * @param {object} opts
+ * @param {object} [opts.codecs]
+ * @returns {Block.Block | undefined}
+ */
+export function maybeDecode ({ cid, bytes }, { codecs = decoders } = { codecs: decoders }) {
+  const codec = codecs[cid.code]
+  if (codec) {
+    return Block.createUnsafe({ cid, bytes, codec })
+  }
 }

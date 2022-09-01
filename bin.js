@@ -2,7 +2,8 @@
 
 import fs from 'fs'
 import sade from 'sade'
-import { linkdex, decodedBlocks } from './index.js'
+import { linkdex, LinkIndexer } from './index.js'
+import { CarBlockIterator } from '@ipld/car/iterator'
 import { pipeline } from 'node:stream/promises'
 
 const pkg = JSON.parse(fs.readFileSync(new URL('./package.json', import.meta.url)))
@@ -18,59 +19,38 @@ cli.command('report <car>')
   .option('--error-if-partial')
   .action(async (first, opts) => {
     const cars = [first, ...opts._]
-    const index = new Map()
+    const index = new LinkIndexer()
     for (const car of cars) {
-      await pipeline(
-        fs.createReadStream(car),
-        async function * (source) {
-          for await (const {src, dest} of linkdex(source)){
-            let linkSet = index.get(src)
-            if (!linkSet) {
-              linkSet = new Set()
-              index.set(src, linkSet)
-            }
-            if (dest) {
-              linkSet.add(dest)
-            }
-          }
-        }
-      )
+      const carStream = fs.createReadStream(car)
+      const carBlocks = await CarBlockIterator.fromIterable(carStream)
+      for await (const block of carBlocks) {
+        index.decodeAndIndex(block)
+      }
     }
-    const res = report(index)
-    console.log(JSON.stringify(res))
-    if (opts['error-if-partial'] && res.structure === 'Partial') {
+    const report = index.report()
+    console.log(JSON.stringify(report))
+    if (opts['error-if-partial'] && report.structure === 'Partial') {
       console.error('Error: CAR(s) contain partial DAG')
       process.exit(1)
     }
   })
-
-function report (index) {
-  for (const [src, links] of index.entries()) {
-    for (const link of links) {
-      if (!index.has(link)) {
-        return { structure: 'Partial', blockCount: index.size }
-      }
-    }
-  }
-  return { structure: 'Complete', blockCount: index.size }
-}
 
 cli.command('print <car>')
   .describe('Print index for a car')
   .option('--mermaid')
   .action(async (first, opts) => {
     const cars = [first, ...opts._]
-    if(opts.mermaid) {
+    if (opts.mermaid) {
       console.log('```mermaid')
       console.log('graph LR')
     }
     for (const car of cars) {
       const inStream = fs.createReadStream(car)
-      for await (const {src, dest} of linkdex(inStream)){
+      for await (const { src, dest } of linkdex(inStream)) {
         console.log(dest ? `${src} --> ${dest}` : src)
       }
     }
-    if(opts.mermaid) {
+    if (opts.mermaid) {
       console.log('```')
     }
   })
@@ -83,8 +63,8 @@ cli.command('index <car>')
       const file = `${car}.linkdex`
       await pipeline(
         fs.createReadStream(car),
-        async function* (source) {
-          for await (const {src, dest} of linkdex(source)){
+        async function * (source) {
+          for await (const { src, dest } of linkdex(source)) {
             yield `${src} --> ${dest}\n`
           }
         },

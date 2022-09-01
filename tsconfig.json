@@ -1,0 +1,13 @@
+{
+  "files": ["index.js", "decode.js"],
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": true,
+    "declaration": true,
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "skipLibCheck": true,
+    "lib": ["ES2021"],
+    "target": "ES2021"
+  }
+}

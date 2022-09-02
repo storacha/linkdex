@@ -14,6 +14,7 @@
     "start": "./bin.js",
     "prepare": "tsc",
     "test": "ava",
+    "pretest": "tsc && standard",
     "lint": "standard",
     "tsc": "tsc",
     "make-cars": "dd if=/dev/urandom of=./random-100mib-file bs=1024 count=102400 && npx ipfs-car --pack random-100mib-file && npx carbites-cli split random-100mib-file.car --size 10MB --strategy treewalk"

@@ -66,4 +66,6 @@ Add good typescript flavour JSDoc comments to the JS source, then **validate** t
 $ npm run tsc
 ```
 
+This is done automatically via the `prepare` npm lifecycle hook.
+
 see: https://www.typescriptlang.org/docs/handbook/declaration-files/dts-from-js.html

@@ -1,6 +1,4 @@
-dist/*
-!dist/index*
-!dist/decode*
+dist
 
 *.car
 

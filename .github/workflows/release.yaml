@@ -12,6 +12,7 @@ jobs:
         with:
           release-type: node
           package-name: linkdex
+      - uses: actions/checkout@v3
       - uses: ./.github/actions/test
       - run: npm publish
         env:

@@ -1,6 +1,6 @@
 {
   "name": "linkdex",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "type": "module",
   "description": "An index mapping block CID to linked block CID.",
   "author": "olizilla",
@@ -10,6 +10,12 @@
   "bin": {
     "linkdex": "./bin.js"
   },
+  "files": [
+    "*.js",
+    "tsconfig.json",
+    "dist/index.d.*",
+    "dist/decode.d.*"
+  ],
   "scripts": {
     "start": "./bin.js",
     "prepare": "tsc",

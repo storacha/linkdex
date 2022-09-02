@@ -55,7 +55,7 @@ export class LinkIndexer {
    * Decode the block and index any CIDs it links to
    * @param {import('@ipld/car/api').Block} block
    * @param {object} [opts]
-   * @param {object} [opts.codecs]
+   * @param {import('./decode.js').BlockDecoders} [opts.codecs]
    */
   decodeAndIndex ({ cid, bytes }, opts) {
     const block = maybeDecode({ cid, bytes }, opts)
@@ -68,7 +68,7 @@ export class LinkIndexer {
 
   /**
    * Index all the links from the block
-   * @param {import('multiformats/block').Block} block
+   * @param {import('multiformats/block').Block<?>} block
    */
   _index (block) {
     this.indexed++

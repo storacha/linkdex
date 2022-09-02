@@ -32,16 +32,16 @@ export class LinkIndexer {
      * Decode the block and index any CIDs it links to
      * @param {import('@ipld/car/api').Block} block
      * @param {object} [opts]
-     * @param {object} [opts.codecs]
+     * @param {import('./decode.js').BlockDecoders} [opts.codecs]
      */
     decodeAndIndex({ cid, bytes }: import('@ipld/car/api').Block, opts?: {
-        codecs?: object;
-    }): void;
+        codecs?: import("./decode.js").BlockDecoders | undefined;
+    } | undefined): void;
     /**
      * Index all the links from the block
-     * @param {import('multiformats/block').Block} block
+     * @param {import('multiformats/block').Block<?>} block
      */
-    _index(block: import("multiformats/block").Block<any>): void;
+    _index(block: import('multiformats/block').Block<unknown>): void;
     /**
      * Find out if any of the links point to a CID that isn't in the CAR
      * @returns {boolean}

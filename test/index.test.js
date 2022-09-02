@@ -79,8 +79,7 @@ test('should handle unknown codecs', async t => {
   const block = await encode({ value: { foo: 'bar ' }, codec: json, hasher })
   const linkIndexer = new LinkIndexer()
   // simulate not having a codec
-  const codecs = []
-  linkIndexer.decodeAndIndex({ cid: block.cid, bytes: block.bytes }, { codecs })
+  linkIndexer.decodeAndIndex({ cid: block.cid, bytes: block.bytes }, { codecs: [] })
   t.is(linkIndexer.getDagStructureLabel(), 'Unknown')
   t.throws(() => linkIndexer.isCompleteDag())
   t.deepEqual(linkIndexer.report(), {

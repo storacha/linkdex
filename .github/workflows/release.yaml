@@ -13,12 +13,7 @@ jobs:
           release-type: node
           package-name: linkdex
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 16
-          cache: 'npm'
-      - run: npm ci
-      - run: nom test
+      - uses: ./.github/actions/test
       - run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}

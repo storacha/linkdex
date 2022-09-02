@@ -1,5 +1,5 @@
 name: Test
-description: 'Checkout and test'
+description: 'Setup and test'
 
 runs:
   using: "composite"

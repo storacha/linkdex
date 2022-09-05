@@ -2,8 +2,6 @@
 
 Creates an index mapping block CID to linked block CID for a CAR.
 
-Origin story: https://gist.github.com/alanshaw/876aafba676b13890398500b96f82d8e
-
 ## Usage
 
 Here is a quick demo of what the linkdex CLI can do.
@@ -41,11 +39,10 @@ npm install
 pass it one or more car files, it writes the index in mermaid syntax to stdout  ✨🎷🐩
 
 ```console
-./bin.js print --mermaid ~/Code/olizilla/cardex-cli/lols.car
+linkdex print --mermaid lols.car
 ```
 
 ```mermaid
-
 graph TD
 
 bafybeibw77p4afchrvmo6ep4fpv7j4aehrn2yqs3tv3uuofc6oag36zq2q --> bafybeih2w5euyf3sodc6efxtpahgwkata46fupjysi4bbnazb4n2b25rry
@@ -55,7 +52,6 @@ bafybeia2i6eqwfqrixh446pavwev37kywowmdpgvx34fbv7asdh3qwpm3y --> bafkreih2bhak5yv
 bafybeif5xvhik6thha5ykg3g73jo3mqd5mhb7orzeznnvwquashmwryhai --> bafkreidkmypp3asq3xiu6mmtcfbzmmhcobpmnaqcyns6535w3u7bz7el64
 bafybeif5xvhik6thha5ykg3g73jo3mqd5mhb7orzeznnvwquashmwryhai --> bafkreid3pefuwyvhsnlrz6xk67f4f6opgqhcrle4bf47kvachwojdgt7re
 bafybeif5xvhik6thha5ykg3g73jo3mqd5mhb7orzeznnvwquashmwryhai --> bafkreigr3beehu5ebbgoisx4rl2vyaqebmohubauc6avefodb5jauz3tyi
-
 ```
 
 ### Generating type declarations

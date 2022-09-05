@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/web3-storage/linkdex/compare/v1.0.0...v1.0.1) (2022-09-05)
+
+
+### Miscellaneous Chores
+
+* update readme ([#8](https://github.com/web3-storage/linkdex/issues/8)) ([57b7431](https://github.com/web3-storage/linkdex/commit/57b743109833e1e5223d062192e1936ceef1f88e))
+
 ## 1.0.0 (2022-09-02)
 
 

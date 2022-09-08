@@ -47,7 +47,7 @@ export class LinkIndexer {
      * @type {Map<string, Set<string>>}
      * */
     this.idx = new Map()
-    this.indexed = 0
+    this.blocksIndexed = 0
     this.undecodable = 0
   }
 
@@ -56,7 +56,6 @@ export class LinkIndexer {
    * @param {import('@ipld/car/api').Block} block
    * @param {object} [opts]
    * @param {import('./decode.js').BlockDecoders} [opts.codecs] - bring your own codecs
-   * @param {boolean} [opts.identityCidLink] - skip block index count if we're processing an identity link cid
    */
   decodeAndIndex ({ cid, bytes }, opts) {
     const block = maybeDecode({ cid, bytes }, opts)
@@ -64,11 +63,26 @@ export class LinkIndexer {
       this.undecodable++
     } else {
       this._index(block)
-      if (opts?.identityCidLink) {
-        // dont count a link as a block
-        return
-      }
-      this.indexed++
+      this.blocksIndexed++
+    }
+  }
+
+  /**
+   * Decode and index identity CID but don't count it as a block.
+   * Where a link is an identity cid, The bytes are in the CID!
+   * We consider a CAR complete even if an identity CID does not appears only as a link,
+   * not a block entry, so we need to index it, but not count it as a block.
+   * @param {import('multiformats/cid').CID} cid
+   * @param {object} [opts]
+   * @param {import('./decode.js').BlockDecoders} [opts.codecs] - bring your own codecs
+   */
+  _decodeAndIndexIdentityCidLink (cid, opts) {
+    const block = maybeDecode({ cid, bytes: cid.multihash.digest }, opts)
+    if (!block) {
+      this.undecodable++
+    } else {
+      this._index(block)
+      // do not increment this.blocksIndexed here as its a link.
     }
   }
 
@@ -85,8 +99,7 @@ export class LinkIndexer {
     for (const [, targetCid] of block.links()) {
       targets.add(targetCid.toString())
       if (targetCid.multihash.code === 0x0) {
-        // link is an identity cid. The bytes are in the CID! We consider a CAR complete even if an identity CID does not appears only as a link, not a block entry, so index it here.
-        this.decodeAndIndex({ cid: targetCid, bytes: new Uint8Array() }, { identityCidLink: true })
+        this._decodeAndIndexIdentityCidLink(targetCid)
       }
     }
     this.idx.set(key, targets)
@@ -142,7 +155,7 @@ export class LinkIndexer {
   report () {
     return {
       structure: this.getDagStructureLabel(),
-      blocksIndexed: this.indexed,
+      blocksIndexed: this.blocksIndexed,
       uniqueCids: this.idx.size,
       undecodeable: this.undecodable
     }

@@ -56,7 +56,7 @@ export class LinkIndexer {
    * @param {import('@ipld/car/api').Block} block
    * @param {object} [opts]
    * @param {import('./decode.js').BlockDecoders} [opts.codecs] - bring your own codecs
-   * @param {boolean} [opts.identityCidLink] - skip block index count if were processing an identity link cid
+   * @param {boolean} [opts.identityCidLink] - skip block index count if we're processing an identity link cid
    */
   decodeAndIndex ({ cid, bytes }, opts) {
     const block = maybeDecode({ cid, bytes }, opts)

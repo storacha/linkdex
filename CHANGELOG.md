@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.0.0](https://github.com/web3-storage/linkdex/compare/v1.0.1...v2.0.0) (2022-09-08)
+
+
+### ⚠ BREAKING CHANGES
+
+* handle identity CIDs (#10)
+
+### Features
+
+* handle identity CIDs ([#10](https://github.com/web3-storage/linkdex/issues/10)) ([333a511](https://github.com/web3-storage/linkdex/commit/333a511fb29f0ef6d6bd462b98afc900b668eea0))
+
 ## [1.0.1](https://github.com/web3-storage/linkdex/compare/v1.0.0...v1.0.1) (2022-09-05)
 
 

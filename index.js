@@ -70,8 +70,8 @@ export class LinkIndexer {
   /**
    * Decode and index identity CID but don't count it as a block.
    * Where a link is an identity cid, The bytes are in the CID!
-   * We consider a CAR complete even if an identity CID does not appears only as a link,
-   * not a block entry, so we need to index it, but not count it as a block.
+   * We consider a CAR complete even if an identity CID appears only as a link, not a block entry.
+   * To make that work we index it, but don't count it as a block.
    * @param {import('multiformats/cid').CID} cid
    * @param {object} [opts]
    * @param {import('./decode.js').BlockDecoders} [opts.codecs] - bring your own codecs

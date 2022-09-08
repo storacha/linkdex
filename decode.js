@@ -25,6 +25,10 @@ const decoders = {
 export function maybeDecode ({ cid, bytes }, { codecs = decoders } = { codecs: decoders }) {
   const codec = codecs[cid.code]
   if (codec) {
+    if (cid.multihash.code === 0x0) {
+      // A CAR Block iterator would give us an empty bytes array, so use the cid bytes instead
+      return Block.createUnsafe({ cid, bytes: cid.multihash.digest, codec })
+    }
     return Block.createUnsafe({ cid, bytes, codec })
   }
 }

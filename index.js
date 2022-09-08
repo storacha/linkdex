@@ -55,7 +55,8 @@ export class LinkIndexer {
    * Decode the block and index any CIDs it links to
    * @param {import('@ipld/car/api').Block} block
    * @param {object} [opts]
-   * @param {import('./decode.js').BlockDecoders} [opts.codecs]
+   * @param {import('./decode.js').BlockDecoders} [opts.codecs] - bring your own codecs
+   * @param {boolean} [opts.identityCidLink] - skip block index count if were processing an identity link cid
    */
   decodeAndIndex ({ cid, bytes }, opts) {
     const block = maybeDecode({ cid, bytes }, opts)
@@ -63,6 +64,11 @@ export class LinkIndexer {
       this.undecodable++
     } else {
       this._index(block)
+      if (opts?.identityCidLink) {
+        // dont count a link as a block
+        return
+      }
+      this.indexed++
     }
   }
 
@@ -71,7 +77,6 @@ export class LinkIndexer {
    * @param {import('multiformats/block').Block<?>} block
    */
   _index (block) {
-    this.indexed++
     const key = block.cid.toString()
     if (this.idx.has(key)) {
       return // already indexed this block
@@ -79,6 +84,10 @@ export class LinkIndexer {
     const targets = new Set()
     for (const [, targetCid] of block.links()) {
       targets.add(targetCid.toString())
+      if (targetCid.multihash.code === 0x0) {
+        // link is an identity cid. The bytes are in the CID! We consider a CAR complete even if an identity CID does not appears only as a link, not a block entry, so index it here.
+        this.decodeAndIndex({ cid: targetCid, bytes: new Uint8Array() }, { identityCidLink: true })
+      }
     }
     this.idx.set(key, targets)
   }
@@ -122,8 +131,8 @@ export class LinkIndexer {
    * @typedef {Object} Report
    * @property {DagStructure} structure - Are there any Linked CIDs that are not present in the set of blocks
    * @property {number} blocksIndexed - How many blocks were indexed
-   * @property {number} blocksUnique - How many unique CIDs
-   * @property {number} blocksUndecodeable - How many blocks failed to decode
+   * @property {number} uniqueCids - How many unique CIDs
+   * @property {number} undecodeable - How many blocks/CIDs failed to decode
    */
 
   /**
@@ -134,8 +143,8 @@ export class LinkIndexer {
     return {
       structure: this.getDagStructureLabel(),
       blocksIndexed: this.indexed,
-      blocksUnique: this.idx.size,
-      blocksUndecodeable: this.undecodable
+      uniqueCids: this.idx.size,
+      undecodeable: this.undecodable
     }
   }
 }

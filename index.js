@@ -47,7 +47,7 @@ export class LinkIndexer {
      * @type {Map<string, Set<string>>}
      * */
     this.idx = new Map()
-    this.indexed = 0
+    this.blocksIndexed = 0
     this.undecodable = 0
   }
 
@@ -55,7 +55,7 @@ export class LinkIndexer {
    * Decode the block and index any CIDs it links to
    * @param {import('@ipld/car/api').Block} block
    * @param {object} [opts]
-   * @param {import('./decode.js').BlockDecoders} [opts.codecs]
+   * @param {import('./decode.js').BlockDecoders} [opts.codecs] - bring your own codecs
    */
   decodeAndIndex ({ cid, bytes }, opts) {
     const block = maybeDecode({ cid, bytes }, opts)
@@ -63,6 +63,26 @@ export class LinkIndexer {
       this.undecodable++
     } else {
       this._index(block)
+      this.blocksIndexed++
+    }
+  }
+
+  /**
+   * Decode and index identity CID but don't count it as a block.
+   * Where a link is an identity cid, The bytes are in the CID!
+   * We consider a CAR complete even if an identity CID appears only as a link, not a block entry.
+   * To make that work we index it, but don't count it as a block.
+   * @param {import('multiformats/cid').CID} cid
+   * @param {object} [opts]
+   * @param {import('./decode.js').BlockDecoders} [opts.codecs] - bring your own codecs
+   */
+  _decodeAndIndexIdentityCidLink (cid, opts) {
+    const block = maybeDecode({ cid, bytes: cid.multihash.digest }, opts)
+    if (!block) {
+      this.undecodable++
+    } else {
+      this._index(block)
+      // do not increment this.blocksIndexed here as its a link.
     }
   }
 
@@ -71,7 +91,6 @@ export class LinkIndexer {
    * @param {import('multiformats/block').Block<?>} block
    */
   _index (block) {
-    this.indexed++
     const key = block.cid.toString()
     if (this.idx.has(key)) {
       return // already indexed this block
@@ -79,6 +98,9 @@ export class LinkIndexer {
     const targets = new Set()
     for (const [, targetCid] of block.links()) {
       targets.add(targetCid.toString())
+      if (targetCid.multihash.code === 0x0) {
+        this._decodeAndIndexIdentityCidLink(targetCid)
+      }
     }
     this.idx.set(key, targets)
   }
@@ -122,8 +144,8 @@ export class LinkIndexer {
    * @typedef {Object} Report
    * @property {DagStructure} structure - Are there any Linked CIDs that are not present in the set of blocks
    * @property {number} blocksIndexed - How many blocks were indexed
-   * @property {number} blocksUnique - How many unique CIDs
-   * @property {number} blocksUndecodeable - How many blocks failed to decode
+   * @property {number} uniqueCids - How many unique CIDs
+   * @property {number} undecodeable - How many blocks/CIDs failed to decode
    */
 
   /**
@@ -133,9 +155,9 @@ export class LinkIndexer {
   report () {
     return {
       structure: this.getDagStructureLabel(),
-      blocksIndexed: this.indexed,
-      blocksUnique: this.idx.size,
-      blocksUndecodeable: this.undecodable
+      blocksIndexed: this.blocksIndexed,
+      uniqueCids: this.idx.size,
+      undecodeable: this.undecodable
     }
   }
 }

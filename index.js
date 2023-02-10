@@ -1,7 +1,5 @@
 import { CarBlockIterator } from '@ipld/car/iterator'
-import { maybeDecode } from './decode.js'
-
-/** @typedef { 'Complete' | 'Partial' | 'Unknown' } DagStructure */
+import { maybeDecode, decoders } from './decode.js'
 
 /**
  * @param {AsyncIterable<Uint8Array>} carStream
@@ -41,24 +39,34 @@ export async function * linkdex (carStream) {
  * the set, then it is complete.
  */
 export class LinkIndexer {
-  constructor () {
+  /**
+   * @param {object} [opts]
+   * @param {AnyBlockDecoder[]} [opts.codecs] - bring your own codecs
+   * @typedef { import('multiformats/block').BlockDecoder<?, ?> } AnyBlockDecoder
+   */
+  constructor (opts) {
     /**
      * Map block CID to the set of CIDs it links to
      * @type {Map<string, Set<string>>}
-     * */
+     */
     this.idx = new Map()
     this.blocksIndexed = 0
     this.undecodable = 0
+    /**
+     * @template {number} Code
+     * @template T
+     * @typedef {Map<Code, import('multiformats/block').BlockDecoder<Code, T>>} BlockDecoderMap
+     */
+    /** @type BlockDecoderMap<?, ?> */
+    this.codecs = opts?.codecs ? new Map(opts.codecs.map(c => [c.code, c])) : decoders
   }
 
   /**
    * Decode the block and index any CIDs it links to
    * @param {import('@ipld/car/api').Block} block
-   * @param {object} [opts]
-   * @param {import('./decode.js').BlockDecoders} [opts.codecs] - bring your own codecs
    */
-  decodeAndIndex ({ cid, bytes }, opts) {
-    const block = maybeDecode({ cid, bytes }, opts)
+  decodeAndIndex ({ cid, bytes }) {
+    const block = maybeDecode({ cid, bytes }, this)
     if (!block) {
       this.undecodable++
     } else {
@@ -73,11 +81,9 @@ export class LinkIndexer {
    * We consider a CAR complete even if an identity CID appears only as a link, not a block entry.
    * To make that work we index it, but don't count it as a block.
    * @param {import('multiformats/cid').CID} cid
-   * @param {object} [opts]
-   * @param {import('./decode.js').BlockDecoders} [opts.codecs] - bring your own codecs
    */
-  _decodeAndIndexIdentityCidLink (cid, opts) {
-    const block = maybeDecode({ cid, bytes: cid.multihash.digest }, opts)
+  _decodeAndIndexIdentityCidLink (cid) {
+    const block = maybeDecode({ cid, bytes: cid.multihash.digest }, this)
     if (!block) {
       this.undecodable++
     } else {
@@ -128,6 +134,7 @@ export class LinkIndexer {
 
   /**
    * Provide a value for the `structure` metadata for the CAR.
+   * @typedef { 'Complete' | 'Partial' | 'Unknown' } DagStructure
    * @returns DagStructure
    */
   getDagStructureLabel () {

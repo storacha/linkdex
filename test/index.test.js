@@ -144,9 +144,9 @@ test('should index dag-json with links for complete dag', async t => {
 
 test('should handle unknown codecs', async t => {
   const block = await encode({ value: { foo: 'bar ' }, codec: json, hasher })
-  const linkIndexer = new LinkIndexer()
   // simulate not having a codec
-  linkIndexer.decodeAndIndex({ cid: block.cid, bytes: block.bytes }, { codecs: [] })
+  const linkIndexer = new LinkIndexer({ codecs: [] })
+  linkIndexer.decodeAndIndex({ cid: block.cid, bytes: block.bytes })
   t.is(linkIndexer.getDagStructureLabel(), 'Unknown')
   t.throws(() => linkIndexer.isCompleteDag())
   t.deepEqual(linkIndexer.report(), {
@@ -155,4 +155,17 @@ test('should handle unknown codecs', async t => {
     uniqueCids: 0,
     undecodeable: 1
   })
+})
+
+test('should only use provided codecs', async t => {
+  const block = await encode({ value: { foo: 'bar ' }, codec: json, hasher })
+  const linkIndexer = new LinkIndexer({ codecs: [json] })
+  linkIndexer.decodeAndIndex({ cid: block.cid, bytes: block.bytes })
+  // we gave it joson, so expect it to decode json
+  t.is(linkIndexer.getDagStructureLabel(), 'Complete')
+
+  const other = await encode({ value: pb.prepare({ Links: [] }), codec: pb, hasher })
+  linkIndexer.decodeAndIndex({ cid: other.cid, bytes: other.bytes })
+  // we didn't gave it pb, so expect it to not decode pb
+  t.is(linkIndexer.getDagStructureLabel(), 'Unknown')
 })

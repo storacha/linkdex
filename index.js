@@ -4,6 +4,14 @@ import { maybeDecode } from './decode.js'
 /** @typedef { 'Complete' | 'Partial' | 'Unknown' } DagStructure */
 
 /**
+ * @typedef {Object} Report
+ * @property {DagStructure} structure - Are there any Linked CIDs that are not present in the set of blocks
+ * @property {number} blocksIndexed - How many blocks were indexed
+ * @property {number} uniqueCids - How many unique CIDs
+ * @property {number} undecodeable - How many blocks/CIDs failed to decode
+ */
+
+/**
  * @param {AsyncIterable<Uint8Array>} carStream
  */
 export async function * decodedBlocks (carStream) {
@@ -128,7 +136,7 @@ export class LinkIndexer {
 
   /**
    * Provide a value for the `structure` metadata for the CAR.
-   * @returns DagStructure
+   * @returns {DagStructure}
    */
   getDagStructureLabel () {
     if (this.undecodable > 0) {
@@ -141,16 +149,8 @@ export class LinkIndexer {
   }
 
   /**
-   * @typedef {Object} Report
-   * @property {DagStructure} structure - Are there any Linked CIDs that are not present in the set of blocks
-   * @property {number} blocksIndexed - How many blocks were indexed
-   * @property {number} uniqueCids - How many unique CIDs
-   * @property {number} undecodeable - How many blocks/CIDs failed to decode
-   */
-
-  /**
    * Get the results after all blocks are indexed.
-   * @returns Report
+   * @returns {Report}
    */
   report () {
     return {

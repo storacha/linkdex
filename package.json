@@ -1,6 +1,6 @@
 {
   "name": "linkdex",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "type": "module",
   "description": "An index mapping block CID to linked block CID.",
   "author": "olizilla",

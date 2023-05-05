@@ -1,5 +1,5 @@
 import { CarBlockIterator } from '@ipld/car/iterator'
-import { maybeDecode } from './decode.js'
+import { maybeDecode, verifyHash } from './decode.js'
 
 /** @typedef { 'Complete' | 'Partial' | 'Unknown' } DagStructure */
 
@@ -9,6 +9,9 @@ import { maybeDecode } from './decode.js'
  * @property {number} blocksIndexed - How many blocks were indexed
  * @property {number} uniqueCids - How many unique CIDs
  * @property {number} undecodeable - How many blocks/CIDs failed to decode
+ * @property {number} hashPassed - How many CIDs were verified as matching block bytes
+ * @property {number} hashFailed - How many CIDs failed verification that they matched block bytes
+ * @property {number} hashUnknown - How many CIDs could not be verified because the hash was unknown
  */
 
 /**
@@ -57,6 +60,9 @@ export class LinkIndexer {
     this.idx = new Map()
     this.blocksIndexed = 0
     this.undecodable = 0
+    this.hashPassed = 0
+    this.hashFailed = 0
+    this.hashUnknown = 0
   }
 
   /**
@@ -73,6 +79,28 @@ export class LinkIndexer {
       this._index(block)
       this.blocksIndexed++
     }
+  }
+
+  /**
+   * Hash the block bytes to verify the CID matches, decode the block and index
+   * any CIDs the block links to.
+   * @param {import('@ipld/car/api').Block} block
+   * @param {object} [opts]
+   * @param {import('./decode.js').BlockDecoders} [opts.codecs] - bring your own codecs
+   * @param {import('./decode.js').MultihashHashers} [opts.hashers] - bring your own hashers
+   */
+  hashAndIndex ({ cid, bytes }, opts) {
+    const result = verifyHash({ cid, bytes }, opts)
+    /** @param {import('./decode.js').HashVerificationResult} r */
+    const handleVerifyResult = r => {
+      if (r === 'pass') this.hashPassed++
+      else if (r === 'fail') this.hashFailed++
+      else if (r === 'unknown') this.hashUnknown++
+      return this.decodeAndIndex({ cid, bytes }, opts)
+    }
+    return result instanceof Promise
+      ? result.then(handleVerifyResult)
+      : handleVerifyResult(result)
   }
 
   /**
@@ -96,7 +124,11 @@ export class LinkIndexer {
 
   /**
    * Index all the links from the block
-   * @param {import('multiformats/block').Block<?>} block
+   * @template T
+   * @template {number} C
+   * @template {number} A
+   * @template {import('multiformats').Version} V
+   * @param {import('multiformats/block/interface').BlockView<T, C, A, V>} block
    */
   _index (block) {
     const key = block.cid.toString()
@@ -118,6 +150,12 @@ export class LinkIndexer {
    * @returns {boolean}
    */
   isCompleteDag () {
+    if (this.hashFailed > 0) {
+      throw new Error('DAG completeness unknown! Some blocks failed hash verification')
+    }
+    if (this.hashUnknown > 0) {
+      throw new Error('DAG completeness unknown! Some CIDs use unknown hash functions')
+    }
     if (this.undecodable > 0) {
       throw new Error('DAG completeness unknown! Some blocks failed to decode')
     }
@@ -139,7 +177,7 @@ export class LinkIndexer {
    * @returns {DagStructure}
    */
   getDagStructureLabel () {
-    if (this.undecodable > 0) {
+    if (this.undecodable > 0 || this.hashFailed > 0 || this.hashUnknown > 0) {
       return 'Unknown'
     }
     if (this.isCompleteDag()) {
@@ -157,7 +195,10 @@ export class LinkIndexer {
       structure: this.getDagStructureLabel(),
       blocksIndexed: this.blocksIndexed,
       uniqueCids: this.idx.size,
-      undecodeable: this.undecodable
+      undecodeable: this.undecodable,
+      hashPassed: this.hashPassed,
+      hashFailed: this.hashFailed,
+      hashUnknown: this.hashUnknown
     }
   }
 }

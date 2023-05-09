@@ -1,5 +1,6 @@
 import { CarBlockIterator } from '@ipld/car/iterator'
-import { maybeDecode, verifyHash } from './decode.js'
+import { validateBlock, UnsupportedHashError, HashMismatchError } from '@web3-storage/car-block-validator'
+import { maybeDecode } from './decode.js'
 
 /** @typedef { 'Complete' | 'Partial' | 'Unknown' } DagStructure */
 
@@ -86,21 +87,31 @@ export class LinkIndexer {
    * any CIDs the block links to.
    * @param {import('@ipld/car/api').Block} block
    * @param {object} [opts]
-   * @param {import('./decode.js').BlockDecoders} [opts.codecs] - bring your own codecs
-   * @param {import('./decode.js').MultihashHashers} [opts.hashers] - bring your own hashers
+   * @param {import('./decode').BlockDecoders} [opts.codecs] - bring your own codecs
    */
   hashAndIndex ({ cid, bytes }, opts) {
-    const result = verifyHash({ cid, bytes }, opts)
-    /** @param {import('./decode.js').HashVerificationResult} r */
-    const handleVerifyResult = r => {
-      if (r === 'pass') this.hashPassed++
-      else if (r === 'fail') this.hashFailed++
-      else if (r === 'unknown') this.hashUnknown++
+    const handleValidateSuccess = () => this.decodeAndIndex({ cid, bytes }, opts)
+    /** @param {Error} err */
+    const handleValidateFailure = err => {
+      if (err instanceof UnsupportedHashError) {
+        this.hashUnknown++
+      } else if (err instanceof HashMismatchError) {
+        this.hashFailed++
+      } else {
+        throw err
+      }
       return this.decodeAndIndex({ cid, bytes }, opts)
     }
-    return result instanceof Promise
-      ? result.then(handleVerifyResult)
-      : handleVerifyResult(result)
+    try {
+      // @ts-expect-error
+      const result = validateBlock({ cid, bytes })
+      if (result instanceof Promise) {
+        return result.then(handleValidateSuccess, handleValidateFailure)
+      }
+      return handleValidateSuccess()
+    } catch (/** @type {any} */ err) {
+      return handleValidateFailure(err)
+    }
   }
 
   /**

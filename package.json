@@ -31,6 +31,7 @@
     "@ipld/dag-json": "^10.0.1",
     "@ipld/dag-pb": "^4.0.2",
     "@multiformats/blake2": "^1.0.13",
+    "@web3-storage/car-block-validator": "^1.2.0",
     "multiformats": "^11.0.2",
     "sade": "^1.8.1"
   },

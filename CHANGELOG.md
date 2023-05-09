@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.1](https://github.com/web3-storage/linkdex/compare/v2.1.0...v2.1.1) (2023-05-09)
+
+
+### Bug Fixes
+
+* types for hashing indexer ([#17](https://github.com/web3-storage/linkdex/issues/17)) ([0922443](https://github.com/web3-storage/linkdex/commit/092244388b71e2698dab6d1d887ffd5cb550d167))
+
 ## [2.1.0](https://github.com/web3-storage/linkdex/compare/v2.0.1...v2.1.0) (2023-05-09)
 
 

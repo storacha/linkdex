@@ -90,7 +90,10 @@ export class LinkIndexer {
    * @param {import('./decode').BlockDecoders} [opts.codecs] - bring your own codecs
    */
   hashAndIndex ({ cid, bytes }, opts) {
-    const handleValidateSuccess = () => this.decodeAndIndex({ cid, bytes }, opts)
+    const handleValidateSuccess = () => {
+      this.hashPassed++
+      return this.decodeAndIndex({ cid, bytes }, opts)
+    }
     /** @param {Error} err */
     const handleValidateFailure = err => {
       if (err instanceof UnsupportedHashError) {

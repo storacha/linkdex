@@ -4,7 +4,7 @@ import * as pb from '@ipld/dag-pb'
 import * as json from '@ipld/dag-json'
 import { identity } from 'multiformats/hashes/identity'
 import { sha256 as hasher } from 'multiformats/hashes/sha2'
-import { blake2b256 } from '@multiformats/blake2/blake2b'
+import { blake2b512 } from '@multiformats/blake2/blake2b'
 import { LinkIndexer } from '../index.js'
 
 test('should index dag-json block with identity links (logically complete car)', async t => {
@@ -227,7 +227,7 @@ test('should handle failed hash verification', async t => {
 })
 
 test('should handle unknown hash functions', async t => {
-  const block = await encode({ value: 'yyy', codec: json, hasher: blake2b256 })
+  const block = await encode({ value: 'yyy', codec: json, hasher: blake2b512 })
 
   const linkIndexer = new LinkIndexer()
   await linkIndexer.hashAndIndex(block)

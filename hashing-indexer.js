@@ -43,7 +43,7 @@ export class HashingLinkIndexer extends LinkIndexer {
       return super.decodeAndIndex({ cid, bytes }, opts)
     }
     try {
-      // @ts-expect-error
+      // @ts-expect-error CID type mismatch because old multiformats
       const result = validateBlock({ cid, bytes })
       if (result instanceof Promise) {
         return result.then(handleValidateSuccess, handleValidateFailure)

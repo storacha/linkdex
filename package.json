@@ -14,8 +14,16 @@
     "*.js",
     "tsconfig.json",
     "dist/index.d.*",
+    "dist/hashing-indexer.d.*",
     "dist/decode.d.*"
   ],
+  "typesVersions": {
+    "*": {
+      "*": [
+        "dist/*"
+      ]
+    }
+  },
   "scripts": {
     "start": "./bin.js",
     "prepare": "tsc",

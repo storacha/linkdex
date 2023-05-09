@@ -4,7 +4,6 @@ import * as pb from '@ipld/dag-pb'
 import * as json from '@ipld/dag-json'
 import { identity } from 'multiformats/hashes/identity'
 import { sha256 as hasher } from 'multiformats/hashes/sha2'
-import { blake2b512 } from '@multiformats/blake2/blake2b'
 import { LinkIndexer } from '../index.js'
 
 test('should index dag-json block with identity links (logically complete car)', async t => {
@@ -19,10 +18,7 @@ test('should index dag-json block with identity links (logically complete car)',
     structure: 'Complete',
     blocksIndexed: 1,
     uniqueCids: 2,
-    undecodeable: 0,
-    hashPassed: 0,
-    hashFailed: 0,
-    hashUnknown: 0
+    undecodeable: 0
   })
 })
 
@@ -39,10 +35,7 @@ test('should index dag-json block and identity block (explicitly complete car)',
     structure: 'Complete',
     blocksIndexed: 2,
     uniqueCids: 2,
-    undecodeable: 0,
-    hashPassed: 0,
-    hashFailed: 0,
-    hashUnknown: 0
+    undecodeable: 0
   })
 })
 
@@ -59,10 +52,7 @@ test('should index identity cid blocks (explicitly complete car)', async t => {
     structure: 'Complete',
     blocksIndexed: 2,
     uniqueCids: 2,
-    undecodeable: 0,
-    hashPassed: 0,
-    hashFailed: 0,
-    hashUnknown: 0
+    undecodeable: 0
   })
 })
 
@@ -78,10 +68,7 @@ test('should index identity cids with dangling links (patitial via identity)', a
     structure: 'Partial',
     blocksIndexed: 1,
     uniqueCids: 1,
-    undecodeable: 0,
-    hashPassed: 0,
-    hashFailed: 0,
-    hashUnknown: 0
+    undecodeable: 0
   })
 })
 
@@ -95,10 +82,7 @@ test('should index dag-pb with no links', async t => {
     structure: 'Complete',
     blocksIndexed: 1,
     uniqueCids: 1,
-    undecodeable: 0,
-    hashPassed: 0,
-    hashFailed: 0,
-    hashUnknown: 0
+    undecodeable: 0
   })
 })
 
@@ -119,10 +103,7 @@ test('should index dag-pb with links for complete dag', async t => {
     structure: 'Complete',
     blocksIndexed: 2,
     uniqueCids: 2,
-    undecodeable: 0,
-    hashPassed: 0,
-    hashFailed: 0,
-    hashUnknown: 0
+    undecodeable: 0
   })
 })
 
@@ -136,10 +117,7 @@ test('should index dag-json with no links', async t => {
     structure: 'Complete',
     blocksIndexed: 1,
     uniqueCids: 1,
-    undecodeable: 0,
-    hashPassed: 0,
-    hashFailed: 0,
-    hashUnknown: 0
+    undecodeable: 0
   })
 })
 
@@ -160,10 +138,7 @@ test('should index dag-json with links for complete dag', async t => {
     structure: 'Complete',
     blocksIndexed: 2,
     uniqueCids: 2,
-    undecodeable: 0,
-    hashPassed: 0,
-    hashFailed: 0,
-    hashUnknown: 0
+    undecodeable: 0
   })
 })
 
@@ -178,69 +153,6 @@ test('should handle unknown codecs', async t => {
     structure: 'Unknown',
     blocksIndexed: 0,
     uniqueCids: 0,
-    undecodeable: 1,
-    hashPassed: 0,
-    hashFailed: 0,
-    hashUnknown: 0
-  })
-})
-
-test('should do hash verification', async t => {
-  const block = await encode({ value: { pass: 'block' }, codec: json, hasher })
-
-  const linkIndexer = new LinkIndexer()
-  await linkIndexer.hashAndIndex(block)
-
-  t.is(linkIndexer.getDagStructureLabel(), 'Complete')
-  t.is(linkIndexer.isCompleteDag(), true)
-  t.deepEqual(linkIndexer.report(), {
-    structure: 'Complete',
-    blocksIndexed: 1,
-    uniqueCids: 1,
-    undecodeable: 0,
-    hashPassed: 1,
-    hashFailed: 0,
-    hashUnknown: 0
-  })
-})
-
-test('should handle failed hash verification', async t => {
-  const block = {
-    cid: (await encode({ value: 'xxx', codec: json, hasher })).cid,
-    bytes: (await encode({ value: 'yyy', codec: json, hasher })).bytes
-  }
-
-  const linkIndexer = new LinkIndexer()
-  await linkIndexer.hashAndIndex(block)
-
-  t.is(linkIndexer.getDagStructureLabel(), 'Unknown')
-  t.throws(() => linkIndexer.isCompleteDag(), { message: /blocks failed hash verification/ })
-  t.deepEqual(linkIndexer.report(), {
-    structure: 'Unknown',
-    blocksIndexed: 1,
-    uniqueCids: 1,
-    undecodeable: 0,
-    hashPassed: 0,
-    hashFailed: 1,
-    hashUnknown: 0
-  })
-})
-
-test('should handle unknown hash functions', async t => {
-  const block = await encode({ value: 'yyy', codec: json, hasher: blake2b512 })
-
-  const linkIndexer = new LinkIndexer()
-  await linkIndexer.hashAndIndex(block)
-
-  t.is(linkIndexer.getDagStructureLabel(), 'Unknown')
-  t.throws(() => linkIndexer.isCompleteDag(), { message: /CIDs use unknown hash functions/ })
-  t.deepEqual(linkIndexer.report(), {
-    structure: 'Unknown',
-    blocksIndexed: 1,
-    uniqueCids: 1,
-    undecodeable: 0,
-    hashPassed: 0,
-    hashFailed: 0,
-    hashUnknown: 1
+    undecodeable: 1
   })
 })

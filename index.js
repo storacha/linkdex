@@ -1,5 +1,4 @@
 import { CarBlockIterator } from '@ipld/car/iterator'
-import { validateBlock, UnsupportedHashError, HashMismatchError } from '@web3-storage/car-block-validator'
 import { maybeDecode } from './decode.js'
 
 /** @typedef { 'Complete' | 'Partial' | 'Unknown' } DagStructure */
@@ -10,9 +9,6 @@ import { maybeDecode } from './decode.js'
  * @property {number} blocksIndexed - How many blocks were indexed
  * @property {number} uniqueCids - How many unique CIDs
  * @property {number} undecodeable - How many blocks/CIDs failed to decode
- * @property {number} hashPassed - How many CIDs were verified as matching block bytes
- * @property {number} hashFailed - How many CIDs failed verification that they matched block bytes
- * @property {number} hashUnknown - How many CIDs could not be verified because the hash was unknown
  */
 
 /**
@@ -61,9 +57,6 @@ export class LinkIndexer {
     this.idx = new Map()
     this.blocksIndexed = 0
     this.undecodable = 0
-    this.hashPassed = 0
-    this.hashFailed = 0
-    this.hashUnknown = 0
   }
 
   /**
@@ -79,41 +72,6 @@ export class LinkIndexer {
     } else {
       this._index(block)
       this.blocksIndexed++
-    }
-  }
-
-  /**
-   * Hash the block bytes to verify the CID matches, decode the block and index
-   * any CIDs the block links to.
-   * @param {import('@ipld/car/api').Block} block
-   * @param {object} [opts]
-   * @param {import('./decode').BlockDecoders} [opts.codecs] - bring your own codecs
-   */
-  hashAndIndex ({ cid, bytes }, opts) {
-    const handleValidateSuccess = () => {
-      this.hashPassed++
-      return this.decodeAndIndex({ cid, bytes }, opts)
-    }
-    /** @param {Error} err */
-    const handleValidateFailure = err => {
-      if (err instanceof UnsupportedHashError) {
-        this.hashUnknown++
-      } else if (err instanceof HashMismatchError) {
-        this.hashFailed++
-      } else {
-        throw err
-      }
-      return this.decodeAndIndex({ cid, bytes }, opts)
-    }
-    try {
-      // @ts-expect-error
-      const result = validateBlock({ cid, bytes })
-      if (result instanceof Promise) {
-        return result.then(handleValidateSuccess, handleValidateFailure)
-      }
-      return handleValidateSuccess()
-    } catch (/** @type {any} */ err) {
-      return handleValidateFailure(err)
     }
   }
 
@@ -164,12 +122,6 @@ export class LinkIndexer {
    * @returns {boolean}
    */
   isCompleteDag () {
-    if (this.hashFailed > 0) {
-      throw new Error('DAG completeness unknown! Some blocks failed hash verification')
-    }
-    if (this.hashUnknown > 0) {
-      throw new Error('DAG completeness unknown! Some CIDs use unknown hash functions')
-    }
     if (this.undecodable > 0) {
       throw new Error('DAG completeness unknown! Some blocks failed to decode')
     }
@@ -191,7 +143,7 @@ export class LinkIndexer {
    * @returns {DagStructure}
    */
   getDagStructureLabel () {
-    if (this.undecodable > 0 || this.hashFailed > 0 || this.hashUnknown > 0) {
+    if (this.undecodable > 0) {
       return 'Unknown'
     }
     if (this.isCompleteDag()) {
@@ -209,10 +161,7 @@ export class LinkIndexer {
       structure: this.getDagStructureLabel(),
       blocksIndexed: this.blocksIndexed,
       uniqueCids: this.idx.size,
-      undecodeable: this.undecodable,
-      hashPassed: this.hashPassed,
-      hashFailed: this.hashFailed,
-      hashUnknown: this.hashUnknown
+      undecodeable: this.undecodable
     }
   }
 }

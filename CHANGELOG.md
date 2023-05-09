@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.2](https://github.com/web3-storage/linkdex/compare/v2.1.1...v2.1.2) (2023-05-09)
+
+
+### Bug Fixes
+
+* again fix types ([#19](https://github.com/web3-storage/linkdex/issues/19)) ([26b65ad](https://github.com/web3-storage/linkdex/commit/26b65ade9772add75b2674a99ebef96ff1162170))
+
 ## [2.1.1](https://github.com/web3-storage/linkdex/compare/v2.1.0...v2.1.1) (2023-05-09)
 
 

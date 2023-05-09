@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.0](https://github.com/web3-storage/linkdex/compare/v2.0.1...v2.1.0) (2023-05-09)
+
+
+### Features
+
+* hash verification ([#15](https://github.com/web3-storage/linkdex/issues/15)) ([4252fe9](https://github.com/web3-storage/linkdex/commit/4252fe9523e7d7e76b17d15e1a3783776835177c))
+
 ## [2.0.1](https://github.com/web3-storage/linkdex/compare/v2.0.0...v2.0.1) (2023-04-21)
 
 

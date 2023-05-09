@@ -4,7 +4,7 @@ import * as json from '@ipld/dag-json'
 import * as cbor from '@ipld/dag-cbor'
 import * as pb from '@ipld/dag-pb'
 
-/** @typedef {Record<number, import('multiformats/block').BlockDecoder<?, ?>>} BlockDecoders */
+/** @typedef {Record<number, import('multiformats/codecs/interface').BlockDecoder<?, ?>>} BlockDecoders */
 
 /** @type BlockDecoders */
 const decoders = {
@@ -20,7 +20,6 @@ const decoders = {
  * @param {import('@ipld/car/api').Block} block
  * @param {object} opts
  * @param {BlockDecoders} [opts.codecs]
- * @returns {Block.Block<?> | undefined}
  */
 export function maybeDecode ({ cid, bytes }, { codecs = decoders } = { codecs: decoders }) {
   const codec = codecs[cid.code]

@@ -26,14 +26,16 @@
     "make-cars": "dd if=/dev/urandom of=./random-100mib-file bs=1024 count=102400 && npx ipfs-car --pack random-100mib-file && npx carbites-cli split random-100mib-file.car --size 10MB --strategy treewalk"
   },
   "dependencies": {
-    "@ipld/car": "^4.1.4",
-    "@ipld/dag-cbor": "^7.0.2",
-    "@ipld/dag-json": "^8.0.10",
-    "@ipld/dag-pb": "^2.1.17",
-    "multiformats": "^9.7.1",
+    "@ipld/car": "^5.1.1",
+    "@ipld/dag-cbor": "^9.0.0",
+    "@ipld/dag-json": "^10.0.1",
+    "@ipld/dag-pb": "^4.0.2",
+    "@web3-storage/car-block-validator": "^1.2.0",
+    "multiformats": "^11.0.2",
     "sade": "^1.8.1"
   },
   "devDependencies": {
+    "@multiformats/blake2": "^1.0.13",
     "@types/node": "^18.7.14",
     "ava": "^4.3.3",
     "standard": "^17.0.0",

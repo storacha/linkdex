@@ -96,7 +96,11 @@ export class LinkIndexer {
 
   /**
    * Index all the links from the block
-   * @param {import('multiformats/block').Block<?>} block
+   * @template T
+   * @template {number} C
+   * @template {number} A
+   * @template {import('multiformats').Version} V
+   * @param {import('multiformats/block/interface').BlockView<T, C, A, V>} block
    */
   _index (block) {
     const key = block.cid.toString()

@@ -2,7 +2,8 @@
 
 import * as fs from 'fs'
 import sade from 'sade'
-import { linkdex, LinkIndexer } from './index.js'
+import { linkdex } from './index.js'
+import { HashingLinkIndexer } from './hashing-indexer.js'
 import { CarBlockIterator } from '@ipld/car/iterator'
 import { pipeline } from 'node:stream/promises'
 
@@ -14,12 +15,11 @@ cli
   .version(pkg.version)
   .example('report partial.car')
 
-cli.command('report <car>')
-  .describe('Print a linkdex report for a car')
+cli.command('report <car>', 'Print a linkdex report for a car', { default: true })
   .option('--error-if-partial')
   .action(async (first, opts) => {
     const cars = [first, ...opts._]
-    const index = new LinkIndexer()
+    const index = new HashingLinkIndexer()
     for (const car of cars) {
       const carStream = fs.createReadStream(car)
       const carBlocks = await CarBlockIterator.fromIterable(carStream)

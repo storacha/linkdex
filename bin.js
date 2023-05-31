@@ -3,7 +3,7 @@
 import * as fs from 'fs'
 import sade from 'sade'
 import { linkdex } from './index.js'
-import { HashingLinkIndexer } from './hashing-indexer.js'
+import { Reporter } from './reporter.js'
 import { CarBlockIterator } from '@ipld/car/iterator'
 import { pipeline } from 'node:stream/promises'
 
@@ -19,7 +19,7 @@ cli.command('report <car>', 'Print a linkdex report for a car', { default: true 
   .option('--error-if-partial')
   .action(async (first, opts) => {
     const cars = [first, ...opts._]
-    const index = new HashingLinkIndexer()
+    const index = new Reporter()
     for (const car of cars) {
       const carStream = fs.createReadStream(car)
       const carBlocks = await CarBlockIterator.fromIterable(carStream)

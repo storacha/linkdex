@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.0](https://github.com/web3-storage/linkdex/compare/v2.1.2...v2.2.0) (2023-05-22)
+
+
+### Features
+
+* produce report with hash info for cli ([#21](https://github.com/web3-storage/linkdex/issues/21)) ([e2561af](https://github.com/web3-storage/linkdex/commit/e2561afa08a5269c08f2dbcc99b66e6a713ab085))
+
 ## [2.1.2](https://github.com/web3-storage/linkdex/compare/v2.1.1...v2.1.2) (2023-05-09)
 
 

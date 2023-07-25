@@ -1,7 +1,12 @@
 import { CarBlockIterator } from '@ipld/car/iterator'
+import { Map as LinkMap } from 'lnmap'
+import { Set as LinkSet } from 'lnset'
 import { maybeDecode } from './decode.js'
 
-/** @typedef { 'Complete' | 'Partial' | 'Unknown' } DagStructure */
+/**
+ * @typedef { 'Complete' | 'Partial' | 'Unknown' } DagStructure
+ * @typedef {import('multiformats').UnknownLink} UnknownLink
+ */
 
 /**
  * @typedef {Object} Report
@@ -52,9 +57,9 @@ export class LinkIndexer {
   constructor () {
     /**
      * Map block CID to the set of CIDs it links to
-     * @type {Map<string, Set<string>>}
-     * */
-    this.idx = new Map()
+     * @type {Map<UnknownLink, Set<UnknownLink>>}
+     */
+    this.idx = new LinkMap()
     this.blocksIndexed = 0
     this.undecodable = 0
   }
@@ -103,18 +108,17 @@ export class LinkIndexer {
    * @param {import('multiformats/block/interface').BlockView<T, C, A, V>} block
    */
   _index (block) {
-    const key = block.cid.toString()
-    if (this.idx.has(key)) {
+    if (this.idx.has(block.cid)) {
       return // already indexed this block
     }
-    const targets = new Set()
+    const targets = new LinkSet()
     for (const [, targetCid] of block.links()) {
-      targets.add(targetCid.toString())
+      targets.add(targetCid)
       if (targetCid.multihash.code === 0x0) {
         this._decodeAndIndexIdentityCidLink(targetCid)
       }
     }
-    this.idx.set(key, targets)
+    this.idx.set(block.cid, targets)
   }
 
   /**

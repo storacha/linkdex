@@ -1,5 +1,16 @@
 # Changelog
 
+## [3.0.0](https://github.com/web3-storage/linkdex/compare/v2.2.0...v3.0.0) (2023-07-25)
+
+
+### ⚠ BREAKING CHANGES
+
+* support index keys as CIDs ([#24](https://github.com/web3-storage/linkdex/issues/24))
+
+### Features
+
+* support index keys as CIDs ([#24](https://github.com/web3-storage/linkdex/issues/24)) ([bf8ab93](https://github.com/web3-storage/linkdex/commit/bf8ab93dd7de2da8d7467986605bb698c09366b0))
+
 ## [2.2.0](https://github.com/web3-storage/linkdex/compare/v2.1.2...v2.2.0) (2023-05-22)
 
 
